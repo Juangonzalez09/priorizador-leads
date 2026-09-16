@@ -45,11 +45,12 @@ Ordenada según el flujo de ejecución (de arriba hacia abajo):
     │
     ├── pipelines/                2. Un pipeline por fuente
     │   ├── pipeline_leads.py        extract → transform → validación → load
-    │   └── pipeline_asesores.py     extract → transform → load
+    │   ├── pipeline_asesores.py     extract → transform → load
+    │   └── pipeline_catalogo.py     extract → transform → load (catálogo + disponibilidad)
     │
     ├── etl/
     │   ├── extract.py            3. Lee los CSV de data/raw
-    │   ├── transform.py          4. Limpia y normaliza (usa src/normalizacion)
+    │   ├── transform.py          4. Limpia, normaliza y explota (usa src/normalizacion)
     │   └── load.py               5. Carga en la base de datos (usa db/)
     │
     ├── src/
@@ -58,7 +59,7 @@ Ordenada según el flujo de ejecución (de arriba hacia abajo):
     │   └── logger.py                Logging
     │
     ├── db/
-    │   ├── modelos.py               Tablas declaradas con el ORM
+    │   ├── modelos.py               Tablas ORM: lead, asesor, catalogo_moto, disponibilidad
     │   └── conexion.py              Conexión, creación de la base y las tablas
     │
     ├── config/
@@ -71,7 +72,8 @@ Ordenada según el flujo de ejecución (de arriba hacia abajo):
 
 - [x] Ingesta, limpieza y validación de leads
 - [x] Ingesta de asesores
-- [ ] Otras fuentes (catálogo, histórico)
+- [x] Ingesta de catálogo (con disponibilidad normalizada)
+- [ ] Histórico de cierres
 - [ ] Deduplicación
 - [ ] Extracción con IA (conversaciones)
 - [ ] Scoring y priorización

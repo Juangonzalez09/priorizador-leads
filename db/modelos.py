@@ -39,3 +39,24 @@ class Asesor(Base):
     capacidad_diaria: Mapped[int | None] = mapped_column(Integer)
     activo: Mapped[bool | None] = mapped_column(Boolean)
     fecha_ingreso: Mapped[datetime | None] = mapped_column(DateTime)
+
+
+class CatalogoMoto(Base):
+    __tablename__ = "catalogo_moto"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    sku: Mapped[str | None] = mapped_column(String)
+    marca: Mapped[str | None] = mapped_column(String)
+    linea: Mapped[str | None] = mapped_column(String)
+    cilindraje: Mapped[int | None] = mapped_column(Integer)
+    segmento: Mapped[str | None] = mapped_column(String)
+    precio_lista: Mapped[int | None] = mapped_column(Integer)
+    unidades_disponibles: Mapped[int | None] = mapped_column(Integer)
+
+
+class Disponibilidad(Base):
+    __tablename__ = "disponibilidad"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    sku: Mapped[str | None] = mapped_column(String)
+    punto_venta_id: Mapped[str | None] = mapped_column(String)

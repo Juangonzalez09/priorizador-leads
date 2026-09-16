@@ -18,3 +18,7 @@ def extraer_leads():
 
 def extraer_asesores():
     return _leer_csv("asesores.csv")
+
+
+def extraer_catalogo():
+    return _leer_csv("catalogo_motos.csv")

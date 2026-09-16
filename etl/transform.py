@@ -5,7 +5,7 @@ from src import normalizacion as norm
 
 
 def transformar_leads(df_crudo):
-    """Normaliza los leads y devuelve las columnas de la tabla `lead`."""
+    """Normaliza los leads y devuelve las columnas de la tabla lead."""
     df = df_crudo
     return pd.DataFrame({
         "lead_id_origen": df["lead_id"],
@@ -25,7 +25,7 @@ def transformar_leads(df_crudo):
 
 
 def transformar_asesores(df_crudo):
-    """Normaliza los asesores y devuelve las columnas de la tabla `asesor`."""
+    """Normaliza los asesores y devuelve las columnas de la tabla asesor."""
     df = df_crudo
     return pd.DataFrame({
         "asesor_id_origen": df["asesor_id"],
@@ -36,3 +36,27 @@ def transformar_asesores(df_crudo):
         "activo": df["activo"].map(norm.si_no_a_bool),
         "fecha_ingreso": df["fecha_ingreso"].map(norm.normalizar_fecha),
     })
+
+
+def transformar_catalogo(df_crudo):
+    """Normaliza el catalogo (una fila por moto) para la tabla catalogo_moto."""
+    df = df_crudo
+    return pd.DataFrame({
+        "sku": df["sku"],
+        "marca": df["marca"].map(norm.limpiar_espacios),
+        "linea": df["linea"].map(norm.limpiar_espacios),
+        "cilindraje": df["cilindraje"].map(norm.a_entero),
+        "segmento": df["segmento"].map(norm.limpiar_espacios),
+        "precio_lista": df["precio_lista"].map(norm.a_entero),
+        "unidades_disponibles": df["unidades_disponibles"].map(norm.a_entero),
+    })
+
+
+def explotar_disponibilidad(df_crudo):
+    """Explota la lista de puntos de venta (separada por |) en filas moto-punto de venta."""
+    d = df_crudo[["sku", "puntos_venta_disponibles"]].copy()
+    d["punto_venta_id"] = d["puntos_venta_disponibles"].str.split("|")
+    d = d.explode("punto_venta_id")
+    d["punto_venta_id"] = d["punto_venta_id"].str.strip()
+    d = d[d["punto_venta_id"] != ""]
+    return d[["sku", "punto_venta_id"]].reset_index(drop=True)

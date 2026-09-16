@@ -2,7 +2,7 @@
 import pandas as pd
 
 from db.conexion import Session, crear_tablas
-from db.modelos import Asesor, Lead
+from db.modelos import Asesor, CatalogoMoto, Disponibilidad, Lead
 
 
 def _cargar(df_limpio, modelo, reemplazar=True):
@@ -21,10 +21,20 @@ def _cargar(df_limpio, modelo, reemplazar=True):
 
 
 def cargar_leads(df_limpio):
-    """Guarda los leads en la tabla `lead`, reemplazando el contenido previo."""
+    """Guarda los leads en la tabla lead, reemplazando el contenido previo."""
     return _cargar(df_limpio, Lead)
 
 
 def cargar_asesores(df_limpio):
-    """Guarda los asesores en la tabla `asesor`, reemplazando el contenido previo."""
+    """Guarda los asesores en la tabla asesor, reemplazando el contenido previo."""
     return _cargar(df_limpio, Asesor)
+
+
+def cargar_catalogo(df_limpio):
+    """Guarda el catalogo en la tabla catalogo_moto, reemplazando el previo."""
+    return _cargar(df_limpio, CatalogoMoto)
+
+
+def cargar_disponibilidad(df_limpio):
+    """Guarda la disponibilidad en la tabla disponibilidad, reemplazando el previo."""
+    return _cargar(df_limpio, Disponibilidad)
