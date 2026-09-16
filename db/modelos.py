@@ -26,6 +26,8 @@ class Lead(Base):
     estado: Mapped[str | None] = mapped_column(String)
     fecha_primer_contacto: Mapped[datetime | None] = mapped_column(DateTime)
     campania: Mapped[str | None] = mapped_column(String)
+    es_duplicado: Mapped[bool | None] = mapped_column(Boolean)
+    lead_canonico_id: Mapped[str | None] = mapped_column(String)
 
 
 class Asesor(Base):

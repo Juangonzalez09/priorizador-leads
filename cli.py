@@ -1,4 +1,12 @@
-"""Punto de entrada del pipeline."""
+"""Punto de entrada.
+
+Uso:
+    python cli.py            corre los pipelines
+    python cli.py --reset    recrea el esquema
+"""
+import sys
+
+from db.conexion import reset_tablas
 from pipelines import (
     pipeline_asesores,
     pipeline_catalogo,
@@ -7,6 +15,9 @@ from pipelines import (
 )
 
 if __name__ == "__main__":
+    if "--reset" in sys.argv:
+        reset_tablas()
+
     leads = pipeline_leads.ejecutar()
     asesores = pipeline_asesores.ejecutar()
     catalogo, disponibilidad = pipeline_catalogo.ejecutar()
