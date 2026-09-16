@@ -31,9 +31,9 @@ Ejecutar el pipeline:
 
     python cli.py
 
-Crea la base y las tablas si no existen, lee `data/raw/leads.csv`, lo limpia
-y lo carga en la tabla `lead`. Para producción, ajustar `DATABASE_URL` con la
-IP del servidor y volver a ejecutar.
+Crea la base y las tablas si no existen, lee las fuentes de `data/raw/`, las
+limpia, valida y carga en la base. Para producción, ajustar `DATABASE_URL` con
+la IP del servidor y volver a ejecutar.
 
 ## Estructura
 
@@ -41,18 +41,20 @@ Ordenada según el flujo de ejecución (de arriba hacia abajo):
 
     priorizador-leads/
     │
-    ├── cli.py                    1. Punto de entrada
+    ├── cli.py                    1. Punto de entrada (corre todos los pipelines)
     │
-    ├── pipelines/
-    │   └── pipeline_leads.py     2. Orquesta extract → transform → load
+    ├── pipelines/                2. Un pipeline por fuente
+    │   ├── pipeline_leads.py        extract → transform → validación → load
+    │   └── pipeline_asesores.py     extract → transform → load
     │
     ├── etl/
-    │   ├── extract.py            3. Lee data/raw/leads.csv
+    │   ├── extract.py            3. Lee los CSV de data/raw
     │   ├── transform.py          4. Limpia y normaliza (usa src/normalizacion)
     │   └── load.py               5. Carga en la base de datos (usa db/)
     │
     ├── src/
     │   ├── normalizacion.py         Reglas de limpieza (teléfono, fecha, ciudad)
+    │   ├── validacion.py            Descarta registros no utilizables
     │   └── logger.py                Logging
     │
     ├── db/
@@ -67,9 +69,10 @@ Ordenada según el flujo de ejecución (de arriba hacia abajo):
 
 ## Estado
 
-- [x] Ingesta y limpieza de leads
+- [x] Ingesta, limpieza y validación de leads
+- [x] Ingesta de asesores
+- [ ] Otras fuentes (catálogo, histórico)
 - [ ] Deduplicación
-- [ ] Otras fuentes (asesores, catálogo, histórico)
 - [ ] Extracción con IA (conversaciones)
 - [ ] Scoring y priorización
 - [ ] Dashboard web

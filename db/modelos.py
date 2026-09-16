@@ -1,7 +1,7 @@
 """Modelos ORM (tablas de la base de datos)."""
 from datetime import datetime
 
-from sqlalchemy import DateTime, Integer, String
+from sqlalchemy import Boolean, DateTime, Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -26,3 +26,16 @@ class Lead(Base):
     estado: Mapped[str | None] = mapped_column(String)
     fecha_primer_contacto: Mapped[datetime | None] = mapped_column(DateTime)
     campania: Mapped[str | None] = mapped_column(String)
+
+
+class Asesor(Base):
+    __tablename__ = "asesor"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    asesor_id_origen: Mapped[str | None] = mapped_column(String)
+    nombre: Mapped[str | None] = mapped_column(String)
+    punto_venta_id: Mapped[str | None] = mapped_column(String)
+    empresa_id: Mapped[str | None] = mapped_column(String)
+    capacidad_diaria: Mapped[int | None] = mapped_column(Integer)
+    activo: Mapped[bool | None] = mapped_column(Boolean)
+    fecha_ingreso: Mapped[datetime | None] = mapped_column(DateTime)

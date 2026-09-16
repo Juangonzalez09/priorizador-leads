@@ -1,6 +1,7 @@
 """Punto de entrada del pipeline."""
-from pipelines.pipeline_leads import ejecutar
+from pipelines import pipeline_asesores, pipeline_leads
 
 if __name__ == "__main__":
-    total = ejecutar()
-    print(f"\nListo: {total} leads ingestados en la tabla 'lead'.")
+    leads = pipeline_leads.ejecutar()
+    asesores = pipeline_asesores.ejecutar()
+    print(f"\nListo: {leads} leads y {asesores} asesores ingestados.")

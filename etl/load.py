@@ -1,21 +1,30 @@
-"""Carga de leads en la base de datos."""
+"""Carga de datos en la base de datos."""
 import pandas as pd
 
 from db.conexion import Session, crear_tablas
-from db.modelos import Lead
+from db.modelos import Asesor, Lead
 
 
-def cargar_leads(df_limpio, reemplazar=True):
-    """Guarda los leads en la tabla `lead`, reemplazando el contenido previo."""
+def _cargar(df_limpio, modelo, reemplazar=True):
     crear_tablas()
 
     # NaN/NaT de pandas -> None para que la base guarde NULL.
     df = df_limpio.astype(object).where(pd.notnull(df_limpio), None)
-    registros = [Lead(**fila) for fila in df.to_dict(orient="records")]
+    registros = [modelo(**fila) for fila in df.to_dict(orient="records")]
 
     with Session() as s:
         if reemplazar:
-            s.query(Lead).delete()
+            s.query(modelo).delete()
         s.add_all(registros)
         s.commit()
     return len(registros)
+
+
+def cargar_leads(df_limpio):
+    """Guarda los leads en la tabla `lead`, reemplazando el contenido previo."""
+    return _cargar(df_limpio, Lead)
+
+
+def cargar_asesores(df_limpio):
+    """Guarda los asesores en la tabla `asesor`, reemplazando el contenido previo."""
+    return _cargar(df_limpio, Asesor)
