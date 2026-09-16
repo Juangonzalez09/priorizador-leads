@@ -136,3 +136,11 @@ def si_no_a_bool(valor):
     if valor is None or not str(valor).strip():
         return None
     return str(valor).strip().upper() == "SI"
+
+
+def a_decimal(valor):
+    """Convierte a float; None si no es un número."""
+    try:
+        return float(str(valor).strip())
+    except (ValueError, TypeError):
+        return None

@@ -1,7 +1,7 @@
 """Modelos ORM (tablas de la base de datos)."""
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Integer, String
+from sqlalchemy import Boolean, DateTime, Float, Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -60,3 +60,22 @@ class Disponibilidad(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     sku: Mapped[str | None] = mapped_column(String)
     punto_venta_id: Mapped[str | None] = mapped_column(String)
+
+
+class HistoricoCierre(Base):
+    __tablename__ = "historico_cierre"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    lead_id_origen: Mapped[str | None] = mapped_column(String)
+    fecha_registro: Mapped[datetime | None] = mapped_column(DateTime)
+    canal: Mapped[str | None] = mapped_column(String)
+    empresa_id: Mapped[str | None] = mapped_column(String)
+    punto_venta_id: Mapped[str | None] = mapped_column(String)
+    modelo_cotizado: Mapped[str | None] = mapped_column(String)
+    precio_lista: Mapped[int | None] = mapped_column(Integer)
+    horas_primer_contacto: Mapped[float | None] = mapped_column(Float)
+    numero_contactos: Mapped[int | None] = mapped_column(Integer)
+    manifesto_cuota_inicial: Mapped[str | None] = mapped_column(String)
+    forma_pago: Mapped[str | None] = mapped_column(String)
+    pidio_cita: Mapped[bool | None] = mapped_column(Boolean)
+    desenlace: Mapped[str | None] = mapped_column(String)

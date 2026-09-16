@@ -60,3 +60,23 @@ def explotar_disponibilidad(df_crudo):
     d["punto_venta_id"] = d["punto_venta_id"].str.strip()
     d = d[d["punto_venta_id"] != ""]
     return d[["sku", "punto_venta_id"]].reset_index(drop=True)
+
+
+def transformar_historico(df_crudo):
+    """Normaliza el historico de cierres para la tabla historico_cierre."""
+    df = df_crudo
+    return pd.DataFrame({
+        "lead_id_origen": df["lead_id"],
+        "fecha_registro": df["fecha_registro"].map(norm.normalizar_fecha),
+        "canal": df["canal"].map(norm.normalizar_canal),
+        "empresa_id": df["empresa_id"],
+        "punto_venta_id": df["punto_venta_id"],
+        "modelo_cotizado": df["modelo_cotizado"].map(norm.limpiar_espacios),
+        "precio_lista": df["precio_lista"].map(norm.a_entero),
+        "horas_primer_contacto": df["horas_al_primer_contacto"].map(norm.a_decimal),
+        "numero_contactos": df["numero_contactos"].map(norm.a_entero),
+        "manifesto_cuota_inicial": df["manifesto_cuota_inicial"].map(norm.limpiar_espacios),
+        "forma_pago": df["forma_pago_declarada"].map(norm.limpiar_espacios),
+        "pidio_cita": df["pidio_cita"].map(norm.si_no_a_bool),
+        "desenlace": df["desenlace"].map(norm.limpiar_espacios),
+    })

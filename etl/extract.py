@@ -22,3 +22,7 @@ def extraer_asesores():
 
 def extraer_catalogo():
     return _leer_csv("catalogo_motos.csv")
+
+
+def extraer_historico():
+    return _leer_csv("historico_cierres.csv")
