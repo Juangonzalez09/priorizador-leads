@@ -1,7 +1,7 @@
 """Modelos ORM (tablas de la base de datos)."""
 from datetime import datetime
 
-from sqlalchemy import DateTime, Integer, String
+from sqlalchemy import Boolean, DateTime, Float, Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -26,3 +26,56 @@ class Lead(Base):
     estado: Mapped[str | None] = mapped_column(String)
     fecha_primer_contacto: Mapped[datetime | None] = mapped_column(DateTime)
     campania: Mapped[str | None] = mapped_column(String)
+
+
+class Asesor(Base):
+    __tablename__ = "asesor"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    asesor_id_origen: Mapped[str | None] = mapped_column(String)
+    nombre: Mapped[str | None] = mapped_column(String)
+    punto_venta_id: Mapped[str | None] = mapped_column(String)
+    empresa_id: Mapped[str | None] = mapped_column(String)
+    capacidad_diaria: Mapped[int | None] = mapped_column(Integer)
+    activo: Mapped[bool | None] = mapped_column(Boolean)
+    fecha_ingreso: Mapped[datetime | None] = mapped_column(DateTime)
+
+
+class CatalogoMoto(Base):
+    __tablename__ = "catalogo_moto"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    sku: Mapped[str | None] = mapped_column(String)
+    marca: Mapped[str | None] = mapped_column(String)
+    linea: Mapped[str | None] = mapped_column(String)
+    cilindraje: Mapped[int | None] = mapped_column(Integer)
+    segmento: Mapped[str | None] = mapped_column(String)
+    precio_lista: Mapped[int | None] = mapped_column(Integer)
+    unidades_disponibles: Mapped[int | None] = mapped_column(Integer)
+
+
+class Disponibilidad(Base):
+    __tablename__ = "disponibilidad"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    sku: Mapped[str | None] = mapped_column(String)
+    punto_venta_id: Mapped[str | None] = mapped_column(String)
+
+
+class HistoricoCierre(Base):
+    __tablename__ = "historico_cierre"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    lead_id_origen: Mapped[str | None] = mapped_column(String)
+    fecha_registro: Mapped[datetime | None] = mapped_column(DateTime)
+    canal: Mapped[str | None] = mapped_column(String)
+    empresa_id: Mapped[str | None] = mapped_column(String)
+    punto_venta_id: Mapped[str | None] = mapped_column(String)
+    modelo_cotizado: Mapped[str | None] = mapped_column(String)
+    precio_lista: Mapped[int | None] = mapped_column(Integer)
+    horas_primer_contacto: Mapped[float | None] = mapped_column(Float)
+    numero_contactos: Mapped[int | None] = mapped_column(Integer)
+    manifesto_cuota_inicial: Mapped[str | None] = mapped_column(String)
+    forma_pago: Mapped[str | None] = mapped_column(String)
+    pidio_cita: Mapped[bool | None] = mapped_column(Boolean)
+    desenlace: Mapped[str | None] = mapped_column(String)

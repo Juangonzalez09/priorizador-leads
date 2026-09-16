@@ -26,7 +26,7 @@ def limpiar_espacios(valor):
 
 
 def normalizar_telefono(valor):
-    """Devuelve el teléfono en 10 dígitos, sin prefijos ni separadores."""
+    """Devuelve el teléfono en 10 dígitos; None si no es un número válido."""
     if valor is None:
         return None
     d = re.sub(r"\D", "", str(valor))
@@ -35,7 +35,7 @@ def normalizar_telefono(valor):
     d = d.lstrip("0")
     if len(d) >= 10:
         return d[-10:]
-    return d or None
+    return None
 
 
 def normalizar_email(valor):
@@ -120,4 +120,27 @@ def normalizar_fecha(valor):
     try:
         return dateparser.parse(v, dayfirst=True)
     except (ValueError, OverflowError):
+        return None
+
+
+def a_entero(valor):
+    """Convierte a int; None si no es un número."""
+    try:
+        return int(str(valor).strip())
+    except (ValueError, TypeError):
+        return None
+
+
+def si_no_a_bool(valor):
+    """'SI' -> True; otro valor -> False; None si está vacío."""
+    if valor is None or not str(valor).strip():
+        return None
+    return str(valor).strip().upper() == "SI"
+
+
+def a_decimal(valor):
+    """Convierte a float; None si no es un número."""
+    try:
+        return float(str(valor).strip())
+    except (ValueError, TypeError):
         return None
