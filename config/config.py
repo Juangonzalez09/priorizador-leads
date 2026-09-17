@@ -10,4 +10,4 @@ DATABASE_URL = os.environ.get(
     "postgresql+psycopg://postgres:postgres@localhost:5432/priorizador_dev",
 )
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.6-flash")

@@ -100,6 +100,8 @@ class ExtraccionIA(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     conversacion_id: Mapped[str | None] = mapped_column(String)
     lead_id_origen: Mapped[str | None] = mapped_column(String)
+    
+    # Extracción de conversación
     modelo_interes: Mapped[str | None] = mapped_column(String)
     presupuesto: Mapped[str | None] = mapped_column(String)
     cuota_inicial: Mapped[str | None] = mapped_column(String)
@@ -108,4 +110,23 @@ class ExtraccionIA(Base):
     objecion_principal: Mapped[str | None] = mapped_column(String)
     pidio_cita: Mapped[bool | None] = mapped_column(Boolean)
     pidio_cotizacion: Mapped[bool | None] = mapped_column(Boolean)
+    
+    # Enriquecimiento con catálogo (fuzzy matching)
+    sku_identificado: Mapped[str | None] = mapped_column(String)
+    marca: Mapped[str | None] = mapped_column(String)
+    linea: Mapped[str | None] = mapped_column(String)
+    precio_lista: Mapped[int | None] = mapped_column(Integer)
+    cilindraje: Mapped[int | None] = mapped_column(Integer)
+    similitud_sku: Mapped[float | None] = mapped_column(Float)
+    
     hash_texto: Mapped[str | None] = mapped_column(String)
+
+
+class Scoring(Base):
+    __tablename__ = "scoring"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    lead_id_origen: Mapped[str | None] = mapped_column(String, unique=True)
+    score: Mapped[int | None] = mapped_column(Integer)
+    temperatura: Mapped[str | None] = mapped_column(String)  # URGENTE, MEDIA, BAJA, MUY_BAJA
+    razon_score: Mapped[str | None] = mapped_column(Text)  # Explicación legible

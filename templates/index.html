@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priorizador de Leads - Motos y Servicios</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card.urgente .number { color: #dc3545; }
+        .stat-card.media .number { color: #ff9800; }
+        .stat-card.baja .number { color: #4caf50; }
+        .stat-card.sin_datos .number { color: #999; }
+        
+        .stat-card .label {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+        
+        table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        thead {
+            background: #f8f9fa;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .temp-urgente {
+            background: #ffebee;
+            color: #dc3545;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .temp-media {
+            background: #fff3e0;
+            color: #ff9800;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .temp-baja {
+            background: #e8f5e9;
+            color: #4caf50;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .score {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .score.high { color: #dc3545; }
+        .score.mid { color: #ff9800; }
+        .score.low { color: #4caf50; }
+        
+        .canal {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .icono {
+            font-size: 1rem;
+            margin-right: 0.25rem;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+        }
+        
+        .title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🏍️ Priorizador de Leads</h1>
+        <p>Motos y Servicios de Colombia · Gestión de leads por prioridad</p>
+    </header>
+    
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card urgente">
+                <div class="number">{{ stats.urgentes }}</div>
+                <div class="label">🔴 Urgentes</div>
+            </div>
+            <div class="stat-card media">
+                <div class="number">{{ stats.medios }}</div>
+                <div class="label">🟠 Medios</div>
+            </div>
+            <div class="stat-card baja">
+                <div class="number">{{ stats.bajos }}</div>
+                <div class="label">🟢 Bajos</div>
+            </div>
+            <div class="stat-card sin_datos">
+                <div class="number">{{ stats.sin_datos }}</div>
+                <div class="label">⚪ Sin Datos</div>
+            </div>
+        </div>
+        
+        <div class="title">
+            📋 Mis leads de hoy ({{ stats.total }} leads · Empresa: {{ stats.empresa }})
+        </div>
+        
+        {% if leads %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Score</th>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                    <th>Ciudad</th>
+                    <th>Modelo</th>
+                    <th>Canal</th>
+                    <th>Intención</th>
+                    <th>Cita</th>
+                    <th>Objeción</th>
+                    <th>Temperatura</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lead in leads %}
+                <tr>
+                    <td>
+                        <span class="score {% if lead.score >= 75 %}high{% elif lead.score >= 50 %}mid{% else %}low{% endif %}">
+                            {{ lead.score }}
+                        </span>
+                    </td>
+                    <td><strong>{{ lead.nombre }}</strong></td>
+                    <td>{{ lead.telefono }}</td>
+                    <td>{{ lead.ciudad }}</td>
+                    <td>{{ lead.modelo_interes[:20] }}</td>
+                    <td><span class="canal">{{ lead.canal }}</span></td>
+                    <td>{{ lead.intencion }}</td>
+                    <td>{{ lead.pidio_cita }}</td>
+                    <td>{{ lead.objecion }}</td>
+                    <td>
+                        <span class="temp-{{ lead.temperatura.lower() }}">
+                            {{ lead.temperatura }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-data">
+            <p>No hay leads disponibles</p>
+        </div>
+        {% endif %}
+        
+        <div style="margin-top: 2rem; padding: 1rem; background: #f0f0f0; border-radius: 8px; font-size: 0.9rem; color: #666;">
+            <strong>ℹ️ Información:</strong><br>
+            • <strong>Score:</strong> Prioridad calculada por algoritmo (0-100)<br>
+            • <strong>Temperatura:</strong> URGENTE (75+), MEDIA (50-74), BAJA (25-49), MUY_BAJA (<25)<br>
+            • <strong>Intención:</strong> Alta / Media / Baja (extraída de conversación WhatsApp)<br>
+            • <strong>Cita:</strong> ✅ si pidió cita, ❌ si no<br>
+            • <strong>Última actualización:</strong> {{ now }}<br>
+        </div>
+    </div>
+</body>
+</html>

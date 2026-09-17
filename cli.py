@@ -1,7 +1,7 @@
 """Punto de entrada.
 
 Uso:
-    python cli.py            corre la ETL
+    python cli.py            corre la ETL + scoring
     python cli.py --reset    recrea el esquema antes de la ETL
     python cli.py --ia       corre también la extracción con IA
 """
@@ -15,6 +15,7 @@ from pipelines import (
     pipeline_extraccion,
     pipeline_historico,
     pipeline_leads,
+    pipeline_scoring,
 )
 
 if __name__ == "__main__":
@@ -35,3 +36,7 @@ if __name__ == "__main__":
     if "--ia" in sys.argv:
         extracciones = pipeline_extraccion.ejecutar()
         print(f"IA: {extracciones} extracciones nuevas.")
+    
+    # Siempre ejecutar scoring (con o sin IA)
+    scoring = pipeline_scoring.ejecutar(recalcular="--reset" in sys.argv)
+    print(f"Scoring: {scoring} leads puntuados.")
