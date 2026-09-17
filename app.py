@@ -59,7 +59,7 @@ def index():
             "score": lead.score or 0,
             "temperatura": lead.temperatura or "SIN_DATOS",
             "intencion": lead.intencion or "-",
-            "pidio_cita": "✅" if lead.pidio_cita else "❌",
+            "pidio_cita": "Si" if lead.pidio_cita else "No",
             "objecion": lead.objecion_principal[:30] if lead.objecion_principal else "-",
             "razon": lead.razon_score or "Sin datos",
             "primer_contacto": lead.fecha_primer_contacto.strftime("%d-%m %H:%M") if lead.fecha_primer_contacto else "Nunca",
