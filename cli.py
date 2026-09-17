@@ -1,8 +1,9 @@
 """Punto de entrada.
 
 Uso:
-    python cli.py            corre los pipelines
-    python cli.py --reset    recrea el esquema
+    python cli.py            corre la ETL
+    python cli.py --reset    recrea el esquema antes de la ETL
+    python cli.py --ia       corre también la extracción con IA
 """
 import sys
 
@@ -11,6 +12,7 @@ from pipelines import (
     pipeline_asesores,
     pipeline_catalogo,
     pipeline_conversaciones,
+    pipeline_extraccion,
     pipeline_historico,
     pipeline_leads,
 )
@@ -25,7 +27,11 @@ if __name__ == "__main__":
     historico = pipeline_historico.ejecutar()
     conversaciones = pipeline_conversaciones.ejecutar()
     print(
-        f"\nListo: {leads} leads, {asesores} asesores, {catalogo} motos, "
+        f"\nETL lista: {leads} leads, {asesores} asesores, {catalogo} motos, "
         f"{disponibilidad} disponibilidades, {historico} cierres, "
         f"{conversaciones} conversaciones."
     )
+
+    if "--ia" in sys.argv:
+        extracciones = pipeline_extraccion.ejecutar()
+        print(f"IA: {extracciones} extracciones nuevas.")

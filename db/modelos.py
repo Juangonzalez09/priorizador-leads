@@ -92,3 +92,20 @@ class Conversacion(Base):
     canal: Mapped[str | None] = mapped_column(String)
     fecha_inicio: Mapped[datetime | None] = mapped_column(DateTime)
     texto: Mapped[str | None] = mapped_column(Text)
+
+
+class ExtraccionIA(Base):
+    __tablename__ = "extraccion_ia"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    conversacion_id: Mapped[str | None] = mapped_column(String)
+    lead_id_origen: Mapped[str | None] = mapped_column(String)
+    modelo_interes: Mapped[str | None] = mapped_column(String)
+    presupuesto: Mapped[str | None] = mapped_column(String)
+    cuota_inicial: Mapped[str | None] = mapped_column(String)
+    forma_pago: Mapped[str | None] = mapped_column(String)
+    intencion: Mapped[str | None] = mapped_column(String)
+    objecion_principal: Mapped[str | None] = mapped_column(String)
+    pidio_cita: Mapped[bool | None] = mapped_column(Boolean)
+    pidio_cotizacion: Mapped[bool | None] = mapped_column(Boolean)
+    hash_texto: Mapped[str | None] = mapped_column(String)
