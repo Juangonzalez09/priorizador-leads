@@ -1,7 +1,7 @@
 """Modelos ORM (tablas de la base de datos)."""
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Float, Integer, String
+from sqlalchemy import Boolean, DateTime, Float, Integer, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -81,3 +81,14 @@ class HistoricoCierre(Base):
     forma_pago: Mapped[str | None] = mapped_column(String)
     pidio_cita: Mapped[bool | None] = mapped_column(Boolean)
     desenlace: Mapped[str | None] = mapped_column(String)
+
+
+class Conversacion(Base):
+    __tablename__ = "conversacion"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    conversacion_id: Mapped[str | None] = mapped_column(String)
+    lead_id_origen: Mapped[str | None] = mapped_column(String)
+    canal: Mapped[str | None] = mapped_column(String)
+    fecha_inicio: Mapped[datetime | None] = mapped_column(DateTime)
+    texto: Mapped[str | None] = mapped_column(Text)

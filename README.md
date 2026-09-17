@@ -76,6 +76,7 @@ Ordenada según el flujo de ejecución (de arriba hacia abajo):
 - [x] Ingesta de catálogo (con disponibilidad normalizada)
 - [x] Ingesta de histórico de cierres
 - [x] Deduplicación
+- [x] Ingesta de conversaciones
 - [ ] Extracción con IA (conversaciones)
 - [ ] Scoring y priorización
 - [ ] Dashboard web
