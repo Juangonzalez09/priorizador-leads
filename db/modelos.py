@@ -130,3 +130,15 @@ class Scoring(Base):
     score: Mapped[int | None] = mapped_column(Integer)
     temperatura: Mapped[str | None] = mapped_column(String)  # URGENTE, MEDIA, BAJA, MUY_BAJA
     razon_score: Mapped[str | None] = mapped_column(Text)  # Explicación legible
+
+
+class Asignacion(Base):
+    __tablename__ = "asignacion"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    lead_id_origen: Mapped[str | None] = mapped_column(String, unique=True)
+    asesor_id_origen: Mapped[str | None] = mapped_column(String)
+    empresa_id: Mapped[str | None] = mapped_column(String)
+    punto_venta_id: Mapped[str | None] = mapped_column(String)
+    orden: Mapped[int | None] = mapped_column(Integer)  # posición en la lista del día del asesor
+    fecha_asignacion: Mapped[datetime | None] = mapped_column(DateTime)

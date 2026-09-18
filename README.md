@@ -238,6 +238,12 @@ las tablas cada vez que cambio algo, lo cual funciona para esta prueba pero ser�
 inaceptable con datos reales de producción; usaría algo adicional para hacer migraciones de
 verdad, que solo alteran lo que cambió.
 
-Y por último, hoy el sistema entrega una lista priorizada pero no reparte esos leads
-entre los asesores; el siguiente paso lógico sería asignarlos automáticamente
-respetando cuántos puede atender cada uno al día.
+Y por último, la asignación de leads a asesores la hice de forma bastante simple:
+reparto round-robin respetando la capacidad diaria de cada uno, priorizando su
+propio punto de venta. Con más tiempo la mejoraría bastante: hoy no considera si
+un asesor ya tiene ese cliente en gestión de días anteriores (podría reasignarlo
+a otro y perder el hilo de la conversación), no balancea por desempeño o tasa de
+cierre histórica de cada asesor, y no tiene forma de reasignar en caliente si
+alguien se satura o se ausenta en el día. Es un punto de partida razonable, pero
+la lógica real de asignación de un CRM necesitaría bastante más reglas de negocio
+detrás.
