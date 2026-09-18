@@ -53,7 +53,7 @@ def transformar_catalogo(df_crudo):
 
 
 def explotar_disponibilidad(df_crudo):
-    """Explota la lista de puntos de venta (separada por |) en filas moto-punto de venta."""
+    """Explota la lista de puntos de venta en filas moto-punto de venta."""
     d = df_crudo[["sku", "puntos_venta_disponibles"]].copy()
     d["punto_venta_id"] = d["puntos_venta_disponibles"].str.split("|")
     d = d.explode("punto_venta_id")
@@ -79,4 +79,25 @@ def transformar_historico(df_crudo):
         "forma_pago": df["forma_pago_declarada"].map(norm.limpiar_espacios),
         "pidio_cita": df["pidio_cita"].map(norm.si_no_a_bool),
         "desenlace": df["desenlace"].map(norm.limpiar_espacios),
+    })
+
+
+def _texto_conversacion(mensajes):
+    lineas = []
+    for m in mensajes or []:
+        emisor = m.get("emisor", "")
+        texto = m.get("texto", "")
+        lineas.append(f"{emisor}: {texto}")
+    return "\n".join(lineas)
+
+
+def transformar_conversaciones(df_crudo):
+    """Aplana cada conversación a una fila con el texto completo."""
+    df = df_crudo
+    return pd.DataFrame({
+        "conversacion_id": df["conversacion_id"],
+        "lead_id_origen": df["lead_id"],
+        "canal": df["canal"].map(norm.normalizar_canal),
+        "fecha_inicio": df["fecha_inicio"].map(norm.normalizar_fecha),
+        "texto": df["mensajes"].map(_texto_conversacion),
     })
