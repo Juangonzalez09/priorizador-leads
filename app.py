@@ -9,14 +9,18 @@ from db.modelos import Lead, Scoring, ExtraccionIA, Conversacion
 
 app = Flask(__name__)
 
-# Para demo sin autenticación, asumimos que el cliente quiere ver EMP-01
-EMPRESA_ACTUAL = "EMP-01"
+# Sin autenticación: la empresa se elige por parámetro (?empresa=EMP-02)
+EMPRESA_DEFAULT = "EMP-01"
 
 
 @app.route("/")
 def index():
-    """Vista principal: mis leads de hoy."""
+    """Vista principal: mis leads de hoy, filtrados por empresa."""
+    empresa_actual = request.args.get("empresa", EMPRESA_DEFAULT)
+
     with Session() as s:
+        empresas = [e[0] for e in s.query(Lead.empresa_id).distinct().order_by(Lead.empresa_id).all()]
+
         # Traer leads NO duplicados de la empresa, ordenados por score
         leads = s.query(
             Lead.lead_id_origen,
@@ -34,7 +38,7 @@ def index():
             ExtraccionIA.pidio_cita,
             ExtraccionIA.objecion_principal,
         ).filter(
-            Lead.empresa_id == EMPRESA_ACTUAL,
+            Lead.empresa_id == empresa_actual,
             (Lead.es_duplicado == False) | (Lead.es_duplicado.is_(None)),
         ).outerjoin(
             Scoring, Lead.lead_id_origen == Scoring.lead_id_origen
@@ -71,10 +75,17 @@ def index():
         "medios": sum(1 for l in leads_data if l["temperatura"] == "MEDIA"),
         "bajos": sum(1 for l in leads_data if l["temperatura"] == "BAJA"),
         "sin_datos": sum(1 for l in leads_data if l["temperatura"] == "SIN_DATOS"),
-        "empresa": EMPRESA_ACTUAL,
+        "empresa": empresa_actual,
     }
-    
-    return render_template("index.html", leads=leads_data, stats=stats, now=datetime.now().strftime("%d-%m-%Y %H:%M"))
+
+    return render_template(
+        "index.html",
+        leads=leads_data,
+        stats=stats,
+        now=datetime.now().strftime("%d-%m-%Y %H:%M"),
+        empresas=empresas,
+        empresa_actual=empresa_actual,
+    )
 
 
 @app.route("/api/lead/<lead_id>")
@@ -119,9 +130,10 @@ def api_lead(lead_id):
 @app.route("/api/stats")
 def api_stats():
     """API: estadísticas generales."""
+    empresa_actual = request.args.get("empresa", EMPRESA_DEFAULT)
     with Session() as s:
         total = s.query(Lead).filter(
-            Lead.empresa_id == EMPRESA_ACTUAL,
+            Lead.empresa_id == empresa_actual,
             (Lead.es_duplicado == False) | (Lead.es_duplicado.is_(None)),
         ).count()
         
