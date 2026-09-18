@@ -81,41 +81,31 @@ def calcular_score(lead: Lead, extraccion: ExtraccionIA | None) -> int:
 
 def ejecutar(recalcular: bool = False):
     """Ejecuta el pipeline de scoring.
-    
-    Args:
-        recalcular: Si True, elimina scoring anterior y recalcula todo.
-                   Si False, solo calcula nuevos leads sin scoring.
+
+    Recalcula siempre a todos los leads: es la única forma de que un lead
+    recién enriquecido por la IA (que antes no tenía extraccion_ia) actualice
+    su score en vez de quedarse con el valor calculado antes de esa extracción.
+    El parámetro `recalcular` se mantiene por compatibilidad con cli.py.
     """
     crear_tablas()
-    
+
     with Session() as s:
-        # Si --recalcular, limpiar tabla
-        if recalcular:
-            s.query(Scoring).delete()
-            s.commit()
-            log.info("Scoring anterior eliminado, recalculando todo...")
-        
-        # Contar cuántos leads ya tienen scoring
         leads_con_scoring = s.query(func.count(Scoring.lead_id_origen)).scalar() or 0
-        
+
         # Traer todos los leads NO duplicados
         leads = s.query(Lead).filter(
             (Lead.es_duplicado == False) | (Lead.es_duplicado.is_(None))
         ).all()
-        
+
         log.info("Scoring: %d leads a procesar (ya tienen: %d)", len(leads), leads_con_scoring)
-        
-        # Para cada lead, buscar extracción IA y calcular score
+
+        # Para cada lead, buscar extracción IA y recalcular su score
         n = 0
         for lead in leads:
-            # ¿Ya tiene scoring?
             existe = s.query(Scoring).filter(
                 Scoring.lead_id_origen == lead.lead_id_origen
             ).first()
-            
-            if existe and not recalcular:
-                continue
-            
+
             # Buscar extracción IA si existe
             extraccion = s.query(ExtraccionIA).filter(
                 ExtraccionIA.lead_id_origen == lead.lead_id_origen

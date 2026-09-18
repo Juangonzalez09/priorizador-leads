@@ -1,7 +1,7 @@
 """Punto de entrada.
 
 Uso:
-    python cli.py            corre la ETL + scoring
+    python cli.py            corre la ETL + scoring + asignación
     python cli.py --reset    recrea el esquema antes de la ETL
     python cli.py --ia       corre también la extracción con IA
 """
@@ -10,6 +10,7 @@ import sys
 from db.conexion import reset_tablas
 from pipelines import (
     pipeline_asesores,
+    pipeline_asignacion,
     pipeline_catalogo,
     pipeline_conversaciones,
     pipeline_extraccion,
@@ -40,3 +41,6 @@ if __name__ == "__main__":
     # Siempre ejecutar scoring (con o sin IA)
     scoring = pipeline_scoring.ejecutar(recalcular="--reset" in sys.argv)
     print(f"Scoring: {scoring} leads puntuados.")
+
+    asignados = pipeline_asignacion.ejecutar()
+    print(f"Asignación: {asignados} leads repartidos entre asesores.")

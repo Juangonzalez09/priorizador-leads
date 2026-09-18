@@ -399,6 +399,12 @@
                 <option value="{{ empresa }}" {% if empresa == empresa_actual %}selected{% endif %}>{{ empresa }}</option>
                 {% endfor %}
             </select>
+            <select class="empresa-select" onchange="location.href = '/?empresa={{ empresa_actual }}&asesor=' + this.value">
+                <option value="" {% if not asesor_actual %}selected{% endif %}>Todos los asesores</option>
+                {% for asesor in asesores %}
+                <option value="{{ asesor.asesor_id_origen }}" {% if asesor.asesor_id_origen == asesor_actual %}selected{% endif %}>{{ asesor.nombre }}</option>
+                {% endfor %}
+            </select>
         </div>
     </nav>
     
@@ -443,6 +449,7 @@
                             <th>Ciudad</th>
                             <th>Modelo</th>
                             <th>Canal</th>
+                            <th>Asesor</th>
                             <th>Intención</th>
                             <th>Cita</th>
                             <th>Temperatura</th>
@@ -466,6 +473,7 @@
                             <td>{{ lead.ciudad }}</td>
                             <td>{{ lead.modelo_interes[:20] }}</td>
                             <td><span class="badge badge-canal">{{ lead.canal }}</span></td>
+                            <td>{{ lead.asesor_id }}</td>
                             <td>{{ lead.intencion }}</td>
                             <td><span class="{% if lead.pidio_cita == 'Si' %}status-si{% else %}status-no{% endif %}">{{ lead.pidio_cita }}</span></td>
                             <td><span class="badge badge-{{ lead.temperatura.lower() }}">{{ lead.temperatura.replace('_', ' ') }}</span></td>
