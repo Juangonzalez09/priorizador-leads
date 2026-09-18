@@ -6,6 +6,18 @@ priorizada por asesor, enriquecida con la información de las conversaciones.
 Pipeline de datos con arquitectura Medallion (bronce → plata → oro) que
 persiste en PostgreSQL usando SQLAlchemy.
 
+## URL pública
+
+```
+https://priorizadorleads-app-iucgem-7b9552-148-230-85-210.traefik.me
+```
+
+El navegador va a mostrar una advertencia de "Su conexión no es privada" al
+entrar. Es esperado: es un dominio gratuito de Dokploy (`*.traefik.me`) que no
+soporta certificado SSL válido, no un problema de la aplicación. Para
+continuar, clic en **Avanzado** → **Continuar a
+priorizadorleads-app-iucgem-7b9552-148-230-85-210.traefik.me (no seguro)**.
+
 ## Arquitectura general
 
 ```
