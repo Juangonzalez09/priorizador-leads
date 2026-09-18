@@ -166,4 +166,58 @@ Ordenada según el flujo de ejecución (de arriba hacia abajo):
 - [x] Scoring y priorización (scorecard calibrado vs histórico)
 - [x] Validación de scoring (Lift 1.62x en top 10%)
 - [x] Dashboard web (Flask + API REST)
-- [ ] Publicación en URL pública
+- [x] Publicación en URL pública (Dokploy)
+
+## Decisiones y supuestos
+
+- **Decidí deduplicar por teléfono + empresa, no solo por teléfono**, porque me di
+  cuenta de que el mismo número aparecía en más de una empresa del grupo, y ahí no
+  son el mismo cliente para efectos de este ejercicio: cada empresa debe seguir
+  viendo solo lo suyo. Cuando sí es un duplicado real dentro de la misma empresa, me
+  quedo con el registro que llegó por WhatsApp o el que tiene el estado de gestión
+  más avanzado, y marco los demás como duplicados en vez de borrarlos, por si en
+  algún momento hay que auditar de dónde salió cada uno.
+- **Dejé las conversaciones guardadas como texto plano** en vez de forzarlas a una
+  tabla con columnas fijas, porque lo que se habla por WhatsApp no tiene una
+  estructura que se pueda anticipar de antemano. Lo que sí tiene forma (intención del
+  cliente, presupuesto, si pidió cita, etc.) se lo pido a la IA y ese resultado sí
+  queda en una tabla aparte, `extraccion_ia`.
+- **Usé la IA únicamente para leer las conversaciones**, y dejé todo lo demás
+  (normalizar teléfonos y fechas, detectar duplicados, calcular el score) como código
+  normal. Me pareció que meter IA en pasos donde una regla simple ya resuelve el
+  problema solo agrega riesgo y complejidad sin necesidad; prefiero usarla donde de
+  verdad hace algo que el código no podría, que es entender texto libre.
+
+- **Tomé la decisión de armar el scoring como un scorecard de reglas** (puntos por
+  señal) desde el inicio del proyecto, en vez de entrenar un modelo de machine
+  learning desde cero. Con ~2.200 registros de histórico no me pareció suficiente
+  dato para entrenar algo confiable, y un scorecard me permite explicar exactamente
+  por qué un lead quedó con score alto (pidió cita, mostró intención alta, mencionó
+  cuota inicial, etc.), en vez de una caja negra que ni yo podría defender en la
+  sustentación. Los pesos de cada señal los calibré comparando la tasa de cierre real
+  del histórico contra cada regla, y validé el resultado contra ese mismo histórico
+  antes de darlo por bueno.
+- **Supuesto sobre "empresa" del dashboard**: sin login implementado, el filtro de
+  empresa se pasa por parámetro en la URL en vez de autenticación real, para poder
+  demostrar el aislamiento en la demo.
+
+## Con más tiempo
+
+Si tuviera más tiempo para seguir puliendo esto, lo primero sería reemplazar el
+filtro por parámetro con un login real por empresa y por asesor, porque hoy cualquiera
+que sepa el nombre de la empresa en la URL puede verla, y eso no es un aislamiento de
+verdad, solo la demostración de que el filtro funciona.
+
+También me gustaría guardar embeddings de las conversaciones y no solo los campos que
+extrae la IA hoy, para poder buscar leads con conversaciones parecidas entre sí (por
+ejemplo, "clientes que dudaron por precio de forma similar a este"), algo que un campo
+de texto suelto o unos campos estructurados no permiten hacer bien.
+
+Cambiaría también la forma en que actualizo el esquema de la base: hoy borro y recreo
+las tablas cada vez que cambio algo, lo cual funciona para esta prueba pero sería
+inaceptable con datos reales de producción; usaría algo adicional para hacer migraciones de
+verdad, que solo alteran lo que cambió.
+
+Y por último, hoy el sistema entrega una lista priorizada pero no reparte esos leads
+entre los asesores; el siguiente paso lógico sería asignarlos automáticamente
+respetando cuántos puede atender cada uno al día.
