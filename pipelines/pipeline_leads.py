@@ -1,7 +1,8 @@
-"""Pipeline de leads: extract -> transform -> validación -> load."""
+"""Pipeline de leads: extract -> transform -> validación -> dedup -> load."""
 from etl.extract import extraer_leads
 from etl.load import cargar_leads
 from etl.transform import transformar_leads
+from src.deduplicacion import deduplicar_leads
 from src.logger import obtener_logger
 from src.validacion import validar_leads
 
@@ -20,7 +21,12 @@ def ejecutar():
     valido = validar_leads(limpio)
     log.info("  %d descartados, %d válidos", len(limpio) - len(valido), len(valido))
 
+    log.info("Dedup: marcando duplicados (mismo teléfono + empresa) ...")
+    dedup = deduplicar_leads(valido)
+    n_dup = int(dedup["es_duplicado"].sum())
+    log.info("  %d duplicados marcados, %d canónicos", n_dup, len(dedup) - n_dup)
+
     log.info("Load: guardando en la tabla 'lead' ...")
-    n = cargar_leads(valido)
+    n = cargar_leads(dedup)
     log.info("  %d leads ingestados", n)
     return n

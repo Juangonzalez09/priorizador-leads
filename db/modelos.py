@@ -1,7 +1,7 @@
 """Modelos ORM (tablas de la base de datos)."""
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Float, Integer, String
+from sqlalchemy import Boolean, DateTime, Float, Integer, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -26,6 +26,8 @@ class Lead(Base):
     estado: Mapped[str | None] = mapped_column(String)
     fecha_primer_contacto: Mapped[datetime | None] = mapped_column(DateTime)
     campania: Mapped[str | None] = mapped_column(String)
+    es_duplicado: Mapped[bool | None] = mapped_column(Boolean)
+    lead_canonico_id: Mapped[str | None] = mapped_column(String)
 
 
 class Asesor(Base):
@@ -79,3 +81,52 @@ class HistoricoCierre(Base):
     forma_pago: Mapped[str | None] = mapped_column(String)
     pidio_cita: Mapped[bool | None] = mapped_column(Boolean)
     desenlace: Mapped[str | None] = mapped_column(String)
+
+
+class Conversacion(Base):
+    __tablename__ = "conversacion"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    conversacion_id: Mapped[str | None] = mapped_column(String)
+    lead_id_origen: Mapped[str | None] = mapped_column(String)
+    canal: Mapped[str | None] = mapped_column(String)
+    fecha_inicio: Mapped[datetime | None] = mapped_column(DateTime)
+    texto: Mapped[str | None] = mapped_column(Text)
+
+
+class ExtraccionIA(Base):
+    __tablename__ = "extraccion_ia"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    conversacion_id: Mapped[str | None] = mapped_column(String)
+    lead_id_origen: Mapped[str | None] = mapped_column(String)
+    
+    # Extracción de conversación
+    modelo_interes: Mapped[str | None] = mapped_column(String)
+    presupuesto: Mapped[str | None] = mapped_column(String)
+    cuota_inicial: Mapped[str | None] = mapped_column(String)
+    forma_pago: Mapped[str | None] = mapped_column(String)
+    intencion: Mapped[str | None] = mapped_column(String)
+    objecion_principal: Mapped[str | None] = mapped_column(String)
+    pidio_cita: Mapped[bool | None] = mapped_column(Boolean)
+    pidio_cotizacion: Mapped[bool | None] = mapped_column(Boolean)
+    
+    # Enriquecimiento con catálogo (fuzzy matching)
+    sku_identificado: Mapped[str | None] = mapped_column(String)
+    marca: Mapped[str | None] = mapped_column(String)
+    linea: Mapped[str | None] = mapped_column(String)
+    precio_lista: Mapped[int | None] = mapped_column(Integer)
+    cilindraje: Mapped[int | None] = mapped_column(Integer)
+    similitud_sku: Mapped[float | None] = mapped_column(Float)
+    
+    hash_texto: Mapped[str | None] = mapped_column(String)
+
+
+class Scoring(Base):
+    __tablename__ = "scoring"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    lead_id_origen: Mapped[str | None] = mapped_column(String, unique=True)
+    score: Mapped[int | None] = mapped_column(Integer)
+    temperatura: Mapped[str | None] = mapped_column(String)  # URGENTE, MEDIA, BAJA, MUY_BAJA
+    razon_score: Mapped[str | None] = mapped_column(Text)  # Explicación legible

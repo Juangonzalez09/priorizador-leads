@@ -22,8 +22,7 @@ def crear_base_si_no_existe():
     if not re.fullmatch(r"[A-Za-z0-9_]+", nombre):
         raise ValueError(f"Nombre de base no válido: {nombre!r}")
 
-    # CREATE DATABASE no admite transacción: se conecta a la base de
-    # mantenimiento en modo AUTOCOMMIT.
+    # CREATE DATABASE no admite transacción; requiere AUTOCOMMIT.
     servidor = create_engine(
         url.set(database="postgres"), future=True, isolation_level="AUTOCOMMIT"
     )
@@ -37,6 +36,13 @@ def crear_base_si_no_existe():
 
 
 def crear_tablas():
-    """Crea la base (si falta) y todas las tablas de los modelos."""
+    """Crea la base y las tablas que falten."""
     crear_base_si_no_existe()
+    Base.metadata.create_all(engine)
+
+
+def reset_tablas():
+    """Borra y recrea todas las tablas."""
+    crear_base_si_no_existe()
+    Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)

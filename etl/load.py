@@ -2,7 +2,14 @@
 import pandas as pd
 
 from db.conexion import Session, crear_tablas
-from db.modelos import Asesor, CatalogoMoto, Disponibilidad, HistoricoCierre, Lead
+from db.modelos import (
+    Asesor,
+    CatalogoMoto,
+    Conversacion,
+    Disponibilidad,
+    HistoricoCierre,
+    Lead,
+)
 
 
 def _cargar(df_limpio, modelo, reemplazar=True):
@@ -43,3 +50,8 @@ def cargar_disponibilidad(df_limpio):
 def cargar_historico(df_limpio):
     """Guarda el historico en la tabla historico_cierre, reemplazando el previo."""
     return _cargar(df_limpio, HistoricoCierre)
+
+
+def cargar_conversaciones(df_limpio):
+    """Guarda las conversaciones en la tabla conversacion, reemplazando el previo."""
+    return _cargar(df_limpio, Conversacion)

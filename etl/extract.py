@@ -1,4 +1,5 @@
 """Extracción de los archivos fuente."""
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -26,3 +27,8 @@ def extraer_catalogo():
 
 def extraer_historico():
     return _leer_csv("historico_cierres.csv")
+
+
+def extraer_conversaciones():
+    ruta = CARPETA_RAW / "conversaciones.json"
+    return pd.DataFrame(json.loads(ruta.read_text(encoding="utf-8-sig")))
