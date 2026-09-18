@@ -124,18 +124,19 @@ def ejecutar(recalcular: bool = False):
             else:
                 temperatura = "MUY_BAJA"
             
-            # Crear o actualizar scoring
-            scoring = Scoring(
-                lead_id_origen=lead.lead_id_origen,
-                score=score_valor,
-                temperatura=temperatura,
-                razon_score=_generar_razon(lead, extraccion, score_valor),
-            )
-            
+            razon = _generar_razon(lead, extraccion, score_valor)
+
             if existe:
-                s.merge(scoring)
+                existe.score = score_valor
+                existe.temperatura = temperatura
+                existe.razon_score = razon
             else:
-                s.add(scoring)
+                s.add(Scoring(
+                    lead_id_origen=lead.lead_id_origen,
+                    score=score_valor,
+                    temperatura=temperatura,
+                    razon_score=razon,
+                ))
             
             n += 1
             if n % 100 == 0:
