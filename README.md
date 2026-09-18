@@ -60,6 +60,26 @@ persiste en PostgreSQL usando SQLAlchemy.
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+## Despliegue
+
+La aplicación está desplegada en un VPS gestionado con **Dokploy**. Corren dos
+contenedores separados dentro del mismo proyecto: uno con **PostgreSQL** (la
+base de datos) y otro construido a partir del `Dockerfile` de este repo, que
+contiene **todo el código Python** (ETL, IA, scoring y el dashboard Flask). Se
+comunican por red interna de Docker, no por IP pública. Cada push a `main`
+puede reconstruir esa imagen desde Dokploy.
+
+Dentro de ese mismo contenedor de la app corren dos cosas distintas, sin que
+una dependa de que la otra esté activa en ese momento:
+
+- **gunicorn** sirve el dashboard Flask de forma continua (`app.py`), atendiendo
+  las peticiones de los usuarios.
+- El **cron programado en Dokploy** dispara, una vez al día, el comando
+  `python cli.py --ia` dentro de ese mismo contenedor: corre la ETL, la
+  extracción con IA y el scoring, y deja los resultados en la base de datos.
+  El dashboard simplemente lee lo que esa corrida dejó, la próxima vez que
+  alguien entra a la página.
+
 ## Requisitos
 
 - Python 3.11 o superior
