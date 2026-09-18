@@ -60,6 +60,26 @@ persiste en PostgreSQL usando SQLAlchemy.
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+## Despliegue
+
+La aplicación está desplegada en un VPS gestionado con **Dokploy**. Corren dos
+contenedores separados dentro del mismo proyecto: uno con **PostgreSQL** (la
+base de datos) y otro construido a partir del `Dockerfile` de este repo, que
+contiene **todo el código Python** (ETL, IA, scoring y el dashboard Flask). Se
+comunican por red interna de Docker, no por IP pública. Cada push a `main`
+puede reconstruir esa imagen desde Dokploy.
+
+Dentro de ese mismo contenedor de la app corren dos cosas distintas, sin que
+una dependa de que la otra esté activa en ese momento:
+
+- **gunicorn** sirve el dashboard Flask de forma continua (`app.py`), atendiendo
+  las peticiones de los usuarios.
+- El **cron programado en Dokploy** dispara, una vez al día, el comando
+  `python cli.py --ia` dentro de ese mismo contenedor: corre la ETL, la
+  extracción con IA y el scoring, y deja los resultados en la base de datos.
+  El dashboard simplemente lee lo que esa corrida dejó, la próxima vez que
+  alguien entra a la página.
+
 ## Requisitos
 
 - Python 3.11 o superior
@@ -218,6 +238,12 @@ las tablas cada vez que cambio algo, lo cual funciona para esta prueba pero ser�
 inaceptable con datos reales de producción; usaría algo adicional para hacer migraciones de
 verdad, que solo alteran lo que cambió.
 
-Y por último, hoy el sistema entrega una lista priorizada pero no reparte esos leads
-entre los asesores; el siguiente paso lógico sería asignarlos automáticamente
-respetando cuántos puede atender cada uno al día.
+Y por último, la asignación de leads a asesores la hice de forma bastante simple:
+reparto round-robin respetando la capacidad diaria de cada uno, priorizando su
+propio punto de venta. Con más tiempo la mejoraría bastante: hoy no considera si
+un asesor ya tiene ese cliente en gestión de días anteriores (podría reasignarlo
+a otro y perder el hilo de la conversación), no balancea por desempeño o tasa de
+cierre histórica de cada asesor, y no tiene forma de reasignar en caliente si
+alguien se satura o se ausenta en el día. Es un punto de partida razonable, pero
+la lógica real de asignación de un CRM necesitaría bastante más reglas de negocio
+detrás.

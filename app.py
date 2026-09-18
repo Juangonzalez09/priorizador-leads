@@ -5,7 +5,7 @@ Flask app simple, respeta separación por empresa (filtrar por empresa_id).
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify
 from db.conexion import Session
-from db.modelos import Lead, Scoring, ExtraccionIA, Conversacion
+from db.modelos import Asesor, Asignacion, Lead, Scoring, ExtraccionIA, Conversacion
 
 app = Flask(__name__)
 
@@ -17,12 +17,16 @@ EMPRESA_DEFAULT = "EMP-01"
 def index():
     """Vista principal: mis leads de hoy, filtrados por empresa."""
     empresa_actual = request.args.get("empresa", EMPRESA_DEFAULT)
+    asesor_actual = request.args.get("asesor", "")  # "" = ver toda la empresa
 
     with Session() as s:
         empresas = [e[0] for e in s.query(Lead.empresa_id).distinct().order_by(Lead.empresa_id).all()]
+        asesores = s.query(Asesor).filter(
+            Asesor.empresa_id == empresa_actual, Asesor.activo == True
+        ).order_by(Asesor.nombre).all()
 
         # Traer leads NO duplicados de la empresa, ordenados por score
-        leads = s.query(
+        query = s.query(
             Lead.lead_id_origen,
             Lead.nombre,
             Lead.telefono,
@@ -37,6 +41,7 @@ def index():
             ExtraccionIA.intencion,
             ExtraccionIA.pidio_cita,
             ExtraccionIA.objecion_principal,
+            Asignacion.asesor_id_origen,
         ).filter(
             Lead.empresa_id == empresa_actual,
             (Lead.es_duplicado == False) | (Lead.es_duplicado.is_(None)),
@@ -44,11 +49,18 @@ def index():
             Scoring, Lead.lead_id_origen == Scoring.lead_id_origen
         ).outerjoin(
             ExtraccionIA, Lead.lead_id_origen == ExtraccionIA.lead_id_origen
-        ).order_by(
+        ).outerjoin(
+            Asignacion, Lead.lead_id_origen == Asignacion.lead_id_origen
+        )
+
+        if asesor_actual:
+            query = query.filter(Asignacion.asesor_id_origen == asesor_actual)
+
+        leads = query.order_by(
             Scoring.score.desc().nulls_last(),
             Lead.fecha_registro.asc(),
         ).limit(100).all()
-    
+
     # Formatear para template
     leads_data = []
     for lead in leads:
@@ -67,14 +79,15 @@ def index():
             "objecion": lead.objecion_principal[:30] if lead.objecion_principal else "-",
             "razon": lead.razon_score or "Sin datos",
             "primer_contacto": lead.fecha_primer_contacto.strftime("%d-%m %H:%M") if lead.fecha_primer_contacto else "Nunca",
+            "asesor_id": lead.asesor_id_origen or "Sin asignar",
         })
-    
+
     stats = {
         "total": len(leads_data),
         "urgentes": sum(1 for l in leads_data if l["temperatura"] == "URGENTE"),
         "medios": sum(1 for l in leads_data if l["temperatura"] == "MEDIA"),
         "bajos": sum(1 for l in leads_data if l["temperatura"] == "BAJA"),
-        "sin_datos": sum(1 for l in leads_data if l["temperatura"] == "SIN_DATOS"),
+        "sin_datos": sum(1 for l in leads_data if l["temperatura"] in ("MUY_BAJA", "SIN_DATOS")),
         "empresa": empresa_actual,
     }
 
@@ -85,6 +98,8 @@ def index():
         now=datetime.now().strftime("%d-%m-%Y %H:%M"),
         empresas=empresas,
         empresa_actual=empresa_actual,
+        asesores=asesores,
+        asesor_actual=asesor_actual,
     )
 
 
